@@ -1,24 +1,31 @@
 import os
 import smtplib
 import random
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'dev-secret-key' # Change in production
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wedding.db'
+# Production Configuration
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
+# Fix for Heroku/Render Postgres URL starting with postgres://
+database_url = os.environ.get('DATABASE_URL', 'sqlite:///wedding.db')
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
 # Configuration
-DEBUG_MODE = True
+DEBUG_MODE = os.environ.get('FLASK_ENV') == 'development'
 TOTAL_SEATS = 120
 
-# Admin Credentials
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "password123"
+# Admin Credentials (Load from Env or Default)
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'password123')
 
 # --- Models ---
 class Reservation(db.Model):
@@ -48,17 +55,37 @@ class Reservation(db.Model):
 
 # --- Helper Functions ---
 def send_email(to_email, subject, body):
-    if DEBUG_MODE:
+    sender_email = os.environ.get('MAIL_USERNAME')
+    sender_password = os.environ.get('MAIL_PASSWORD')
+    smtp_server = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+    smtp_port = int(os.environ.get('MAIL_PORT', 587))
+
+    # Fallback to mock if credentials are missing (Local Dev)
+    if not sender_email or not sender_password:
         print("----------------------------------------------------------------")
-        print(f"[DEBUG MODE] Mock Email Sent")
-        print(f"To: {to_email}")
+        print(f"[MOCK EMAIL] To: {to_email}")
         print(f"Subject: {subject}")
         print(f"Body: {body}")
         print("----------------------------------------------------------------")
-    else:
-        # Placeholder for real SMTP logic
-        print(f"Sending real email to {to_email}...") 
-        pass
+        return True
+
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.send_message(msg)
+        server.quit()
+        print(f"Email sent to {to_email}")
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False
 
 def get_random_available_seat():
     # Get all seat numbers that are actively reserved (PENDING or CONFIRMED)
@@ -237,4 +264,4 @@ def logout():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True, port=5000, host='0.0.0.0')
+    app.run(debug=DEBUG_MODE, port=5000, host='0.0.0.0')
