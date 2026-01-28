@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha Ndivhuwo & Mpho - Wedding Reservation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Great+Vibes&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1 class="font-holiday">Ndivhuwo & Mpho</h1>
+            <p>We invite you to celebrate our special day with us.</p>
+        </header>
+
+
+
+        <!-- Wedding Details & Rsvp Sections -->
+        <div class="details-container"
+            style="display: flex; justify-content: center; gap: 4rem; flex-wrap: wrap; margin: 3rem auto; font-family: var(--font-serif); align-items: flex-start; max-width: 1000px;">
+
+            <!-- Column 1: Wedding Details -->
+            <div style="flex: 1; min-width: 300px; text-align: center;">
+                <h2 class="font-holiday" style="color: var(--accent-color); font-size: 2.5rem; margin-bottom: 1.5rem;">
+                    Wedding Details</h2>
+
+                <p style="font-size: 1.2rem; margin-bottom: 0.5rem;"><strong>Date:</strong> 2nd May 2026 @ 10:00 AM</p>
+                <p style="font-size: 1.2rem; margin-bottom: 1rem;"><strong>Venue:</strong> 22 Denne Rd., Rand
+                    Collieries, Brakpan</p>
+
+                <!-- Google Map with Theme Styling -->
+                <div
+                    style="width: 100%; height: 200px; margin-bottom: 1rem; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                    <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
+                        src="https://maps.google.com/maps?q=22%20Denne%20Rd%2C%20Rand%20Collieries%2C%20Brakpan&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                        style="filter: grayscale(100%) sepia(20%) contrast(90%) opacity(0.9); border: none;"></iframe>
+                </div>
+
+                <p style="font-size: 1.2rem; margin-bottom: 1rem;"><strong>Theme:</strong> Beige & White</p>
+
+                <div style="margin-top: 2rem; font-style: italic; color: #555; font-size: 1.2rem;">
+                    "Where you go I will go, and where you stay I will stay." <br>
+                    <span style="font-size: 0.9rem;">— Ruth 1:16 NIV</span>
+                </div>
+            </div>
+
+            <!-- Column 2: Rsvp -->
+            <div style="flex: 1; min-width: 300px; text-align: center;">
+                <div
+                    style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: inline-block; width: 100%; max-width: 400px;">
+                    <h3 class="font-holiday" style="margin-top:0; color: var(--accent-color); font-size: 2.5rem;">Rsvp
+                    </h3>
+                    <p style="font-size: 0.9rem; margin: 0.5rem 0; color: #777;">Please confirm by 12th March 2026</p>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 1rem 0;">
+                    <p style="margin: 0.5rem 0; font-size: 1.1rem;">Irene Sathege: <strong>+27 73 146 8192</strong></p>
+                    <p style="margin: 0.5rem 0; font-size: 1.1rem;">Kete Sadiki: <strong>+27 72 239 9527</strong></p>
+                    <p style="margin: 0.5rem 0; font-size: 1.1rem;">Beauty Rasetilo: <strong>+27 73 805 3169</strong>
+                    </p>
+                    <p
+                        style="color: #c0392b; font-size: 0.8rem; margin-top: 1.5rem; font-weight: bold; letter-spacing: 1px;">
+                        * NO CHILDREN ALLOWED</p>
+                </div>
+            </div>
+        </div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box" style="background-color: var(--available-color);"></div>
+                <span>Available</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background-color: var(--reserved-color);"></div>
+                <span>Reserved</span>
+            </div>
+        </div>
+
+        <div class="seat-grid">
+            {% for i in range(1, total_seats + 1) %}
+            <div class="seat {% if i in reserved_seats %}reserved{% else %}available{% endif %}" id="seat-{{ i }}" {% if
+                i not in reserved_seats %}onclick="openReservationModal({{ i }})" {% endif %}
+                title="{% if i in reserved_seats %}Reserved{% else %}Seat {{ i }}{% endif %}">
+                {{ i }}
+            </div>
+            {% endfor %}
+        </div>
+
+        <button id="reserveBtn" class="btn">Reserve a Seat</button>
+    </div>
+
+    <!-- Reservation Modal -->
+    <div id="reservationModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Reserve Your Seat</h2>
+            <p>Please enter your details below. The system will assign you the best available seat.</p>
+            <form id="reservationForm">
+                <input type="hidden" id="seat_number" name="seat_number">
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" required>
+
+                <label for="surname">Surname</label>
+                <input type="text" id="surname" name="surname" required>
+
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required>
+
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="dietary_restrictions">Dietary Restrictions (Optional)</label>
+                <input type="text" id="dietary_restrictions" name="dietary_restrictions">
+
+                <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Submit Reservation</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content" style="text-align: center; padding: 3rem;">
+            <h2 id="notifTitle" class="font-holiday" style="color: var(--accent-color); margin-bottom: 1rem;">Success
+            </h2>
+            <p id="notifMessage" style="font-size: 1.2rem; margin-bottom: 2rem;">Message goes here.</p>
+            <button class="btn" onclick="closeNotification()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Modal Logic
+        const modal = document.getElementById("reservationModal");
+        const btn = document.getElementById("reserveBtn");
+        const span = document.getElementsByClassName("close")[0];
+        const seatInput = document.getElementById("seat_number");
+        const modalTitle = document.querySelector("#reservationModal h2");
+
+        function openReservationModal(seatNum = null) {
+            modal.style.display = "flex";
+            if (seatNum) {
+                seatInput.value = seatNum;
+                modalTitle.innerText = "Reserve Seat #" + seatNum;
+            } else {
+                seatInput.value = "";
+                modalTitle.innerText = "Reserve a Random Seat";
+            }
+        }
+
+        btn.onclick = function () {
+            openReservationModal(null);
+        }
+
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        const notifModal = document.getElementById("notificationModal");
+
+        function showNotification(title, message, isSuccess) {
+            document.getElementById("notifTitle").innerText = title;
+            document.getElementById("notifTitle").style.color = isSuccess ? "var(--accent-color)" : "#c0392b";
+            document.getElementById("notifMessage").innerText = message;
+            notifModal.style.display = "flex";
+        }
+
+        function closeNotification() {
+            notifModal.style.display = "none";
+            if (document.getElementById("notifTitle").innerText.includes("Reservation submitted")) {
+                location.reload();
+            }
+        }
+
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Form Submission
+        const form = document.getElementById('reservationForm');
+        form.onsubmit = async function (e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/reserve', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    modal.style.display = "none";
+                    showNotification('Thank You!', result.message, true);
+                } else {
+                    showNotification('Attention', result.message, false);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Error', 'An error occurred while submitting.', false);
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>
