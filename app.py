@@ -239,7 +239,14 @@ def admin_action(id, action):
         # If it was previously declined, the seat_number might be negative (released).
         # We need to restore it to a positive number.
         if reservation.seat_number < 0:
-            original_seat = abs(reservation.seat_number)
+            val = abs(reservation.seat_number)
+            # Legacy format (-seat) vs New format (-(id*1000 + seat))
+            # Assuming TOTAL_SEATS < 1000, legacy values are < 1000.
+            if val >= 1000:
+                original_seat = val % 1000
+            else:
+                original_seat = val
+                
             # Check if this seat is now taken by someone else
             existing = Reservation.query.filter_by(seat_number=original_seat).filter(
                 Reservation.status.in_(['PENDING', 'CONFIRMED'])
@@ -265,7 +272,10 @@ def admin_action(id, action):
         
         # Free the seat if it's currently positive
         if reservation.seat_number > 0:
-            reservation.seat_number = -reservation.seat_number
+            # Generate a UNIQUE negative number to avoid "IntegrityError: UNIQUE constraint failed"
+            # formula: -1 * ((id * 1000) + seat_number)
+            # This preserves the seat info (mod 1000) and ensures uniqueness (via id).
+            reservation.seat_number = -1 * ((reservation.id * 1000) + reservation.seat_number)
             
         db.session.commit()
         return jsonify({'success': True, 'message': 'Reservation declined.'})
