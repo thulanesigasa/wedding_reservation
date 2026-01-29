@@ -183,6 +183,12 @@
         const form = document.getElementById('reservationForm');
         form.onsubmit = async function (e) {
             e.preventDefault();
+
+            // Disable button to prevent double-booking
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
+
             const formData = new FormData(form);
 
             try {
@@ -198,10 +204,14 @@
                     showNotification('Thank You!', result.message, true);
                 } else {
                     showNotification('Attention', result.message, false);
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Submit Reservation";
                 }
             } catch (error) {
                 console.error('Error:', error);
                 showNotification('Error', 'An error occurred while submitting.', false);
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Reservation";
             }
         }
 

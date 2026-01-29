@@ -70,10 +70,34 @@ def send_email(to_email, subject, body):
         return True
 
     msg = MIMEMultipart()
-    msg['From'] = sender_email
+    msg['From'] = f"Ndivhuwo & Mpho <{sender_email}>"
     msg['To'] = to_email
     msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'plain'))
+    
+    # HTML Email Template
+    html_body = f"""
+    <html>
+        <body style="font-family: 'Times New Roman', serif; color: #333; line-height: 1.6; background-color: #f9f9f9; padding: 20px;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px; border: 1px solid #e0e0e0; text-align: center;">
+                <h1 style="color: #c5a059; font-family: 'Great Vibes', cursive; font-size: 3em; margin-bottom: 10px;">Ndivhuwo & Mpho</h1>
+                <p style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.9em; color: #666; margin-bottom: 30px;">Wedding Celebration</p>
+                <hr style="border: 0; border-top: 1px solid #c5a059; width: 50%; margin: 20px auto;">
+                
+                <div style="text-align: left; margin: 30px 0;">
+                    {body}
+                </div>
+                
+                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; color: #888; font-size: 0.9em;">
+                    <p>We can't wait to celebrate with you!</p>
+                    <p><strong>Date:</strong> 2nd May 2026<br>
+                    <strong>Venue:</strong> 22 Denne Rd., Rand Collieries, Brakpan</p>
+                </div>
+            </div>
+        </body>
+    </html>
+    """
+    
+    msg.attach(MIMEText(html_body, 'html'))
 
     try:
         server = smtplib.SMTP(smtp_server, smtp_port)
@@ -86,6 +110,15 @@ def send_email(to_email, subject, body):
     except Exception as e:
         print(f"Error sending email: {e}")
         return False
+
+# Async Wrapper
+import threading
+def send_email_async(to_email, subject, body):
+    thread = threading.Thread(target=send_email, args=(to_email, subject, body))
+    thread.daemon = True
+    thread.start()
+
+# ... (Previous code remains) ...
 
 def get_random_available_seat():
     # Get all seat numbers that are actively reserved (PENDING or CONFIRMED)
@@ -136,6 +169,8 @@ def reserve():
         except ValueError:
              return jsonify({'success': False, 'message': 'Invalid seat number format.'}), 400
     else:
+        # Check if the user mistakenly sent an empty seat request but intended to pick one?
+        # No, the logic handles "no seat selected" -> "random".
         seat_number = get_random_available_seat()
 
     if not seat_number:
@@ -153,11 +188,11 @@ def reserve():
         db.session.add(new_reservation)
         db.session.commit()
         
-        # Notify Admin (Mock)
-        send_email(
+        # Notify Admin (Async)
+        send_email_async(
             "admin@wedding.com", 
             "New Reservation Received", 
-            f"New reservation from {data['first_name']} {data['surname']} for seat #{seat_number}."
+            f"<p>New reservation from <strong>{data['first_name']} {data['surname']}</strong> for seat <strong>#{seat_number}</strong>.</p>"
         )
         
         return jsonify({'success': True, 'message': 'Reservation submitted! Waiting for confirmation.'})
@@ -243,10 +278,11 @@ def admin_action(id, action):
              return jsonify({'success': False, 'message': 'Email already sent.'}), 400
 
         try:
-            send_email(
+            # Use Async send to avoid timeout on admin dashboard
+            send_email_async(
                 reservation.email,
                 "You're In! Wedding Confirmation",
-                f"Dear {reservation.first_name},\n\nYour seat #{reservation.seat_number} for the wedding of Ndivhuwo & Mpho has been confirmed.\n\nWe look forward to seeing you!"
+                f"<p>Dear {reservation.first_name},</p><p>Your seat <strong>#{reservation.seat_number}</strong> for the wedding of Ndivhuwo & Mpho has been confirmed.</p>"
             )
             reservation.email_sent = True
             db.session.commit()
