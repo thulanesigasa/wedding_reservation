@@ -69,13 +69,17 @@ class Reservation(db.Model):
 
 # --- Helper Functions ---
 def send_email(to_email, subject, body, include_footer=True):
-    sender_email = os.environ.get('MAIL_USERNAME')
-    sender_password = os.environ.get('MAIL_PASSWORD')
+    # SMTP Credentials (from Env)
+    smtp_username = os.environ.get('MAIL_USERNAME')
+    smtp_password = os.environ.get('MAIL_PASSWORD')
     smtp_server = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
     smtp_port = int(os.environ.get('MAIL_PORT', 587))
     
+    # Visible Sender (MUST be the verified domain)
+    sender_email = "reservations@ndivhuandmpho.co.za"
+    
     print(f"DEBUG: Attempting to send email to {to_email}")
-    print(f"DEBUG: Server={smtp_server}, Port={smtp_port}, User={sender_email}")
+    print(f"DEBUG: Server={smtp_server}, Port={smtp_port}, User={smtp_username} (Auth Only)")
 
     # HTML Email Template
     html_body = f"""
@@ -113,7 +117,7 @@ def send_email(to_email, subject, body, include_footer=True):
     msg.attach(MIMEText(html_body, 'html'))
 
     # Fallback to mock if credentials are missing (Local Dev)
-    if not sender_email or not sender_password:
+    if not smtp_username or not smtp_password:
         print("----------------------------------------------------------------")
         print(f"[MOCK EMAIL] To: {to_email}")
         print(f"Subject: {subject}")
@@ -129,7 +133,7 @@ def send_email(to_email, subject, body, include_footer=True):
             server = smtplib.SMTP(smtp_server, smtp_port)
             server.starttls()
             
-        server.login(sender_email, sender_password)
+        server.login(smtp_username, smtp_password)
         server.send_message(msg)
         server.quit()
         return True
