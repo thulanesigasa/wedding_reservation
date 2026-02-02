@@ -281,8 +281,18 @@ def admin_action(id, action):
         return jsonify({'success': True, 'message': 'Reservation declined.'})
     
     elif action == 'send_email':
-        if reservation.status != 'CONFIRMED':
-            return jsonify({'success': False, 'message': 'Can only send emails to CONFIRMED guests.'}), 400
+        if reservation.status == 'CONFIRMED':
+            subject = "You're In! Wedding Confirmation"
+            body = f"<p>Dear {reservation.first_name},</p><p>Your seat <strong>#{reservation.seat_number}</strong> for the wedding of Ndivhuwo & Mpho has been confirmed.</p>"
+        elif reservation.status == 'DECLINED':
+            subject = "Update on your Reservation Request - Ndivhuwo & Mpho"
+            body = (f"<p>Dear {reservation.first_name},</p>"
+                    "<p>Thank you for RSVPing to our wedding. We are truly humbled by the love and support we have received.</p>"
+                    "<p>Unfortunately, due to strict venue capacity limitations, we are unable to accommodate your reservation request at this time. "
+                    "We are genuinely sorry for this outcome and hope you understand that this decision was difficult for us to make.</p>"
+                    "<p>Thank you for your warm wishes.</p>")
+        else:
+            return jsonify({'success': False, 'message': 'Can only send emails to CONFIRMED or DECLINED guests.'}), 400
             
         if reservation.email_sent:
              return jsonify({'success': False, 'message': 'Email already sent.'}), 400
@@ -291,12 +301,12 @@ def admin_action(id, action):
             # Use Async send to avoid timeout on admin dashboard
             send_email_async(
                 reservation.email,
-                "You're In! Wedding Confirmation",
-                f"<p>Dear {reservation.first_name},</p><p>Your seat <strong>#{reservation.seat_number}</strong> for the wedding of Ndivhuwo & Mpho has been confirmed.</p>"
+                subject,
+                body
             )
             reservation.email_sent = True
             db.session.commit()
-            return jsonify({'success': True, 'message': 'Confirmation email sent successfully!'})
+            return jsonify({'success': True, 'message': 'Email sent successfully!'})
         except:
              return jsonify({'success': False, 'message': 'Failed to send email.'}), 500
         

@@ -33,7 +33,11 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    /* Vertically center */
     min-height: 100vh;
+    text-align: center;
+    /* Ensure default horizontal center */
 }
 
 h1,
@@ -418,6 +422,8 @@ th {
     display: inline-block;
     width: 100%;
     max-width: 400px;
+    text-align: center;
+    /* Explicitly center */
 }
 
 .rsvp-title {
