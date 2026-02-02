@@ -22,48 +22,40 @@
 
 
         <!-- Wedding Details & Rsvp Sections -->
-        <div class="details-container"
-            style="display: flex; justify-content: center; gap: 4rem; flex-wrap: wrap; margin: 3rem auto; font-family: var(--font-serif); align-items: flex-start; max-width: 1000px;">
+        <div class="details-section">
 
             <!-- Column 1: Wedding Details -->
-            <div style="flex: 1; min-width: 300px; text-align: center;">
-                <h2 class="font-holiday" style="color: var(--accent-color); font-size: 2.5rem; margin-bottom: 1.5rem;">
-                    Wedding Details</h2>
+            <div class="details-column">
+                <h2 class="section-title">Wedding Details</h2>
 
-                <p style="font-size: 1.2rem; margin-bottom: 0.5rem;"><strong>Date:</strong> 2nd May 2026 @ 10:00 AM</p>
-                <p style="font-size: 1.2rem; margin-bottom: 1rem;"><strong>Venue:</strong> 22 Denne Rd., Rand
-                    Collieries, Brakpan</p>
+                <p class="details-text"><strong>Date:</strong> 2nd May 2026 @ 10:00 AM</p>
+                <p class="details-text venue"><strong>Venue:</strong> 22 Denne Rd., Rand Collieries, Brakpan</p>
 
                 <!-- Google Map with Theme Styling -->
-                <div
-                    style="width: 100%; height: 200px; margin-bottom: 1rem; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                <div class="map-container">
                     <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
                         src="https://maps.google.com/maps?q=22%20Denne%20Rd%2C%20Rand%20Collieries%2C%20Brakpan&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                        style="filter: grayscale(100%) sepia(20%) contrast(90%) opacity(0.9); border: none;"></iframe>
+                        class="map-frame"></iframe>
                 </div>
 
-                <p style="font-size: 1.2rem; margin-bottom: 1rem;"><strong>Theme:</strong> Beige & White</p>
+                <p class="details-text"><strong>Theme:</strong> Beige & White</p>
 
-                <div style="margin-top: 2rem; font-style: italic; color: #555; font-size: 1.2rem;">
+                <div class="quote-box">
                     "Where you go I will go, and where you stay I will stay." <br>
-                    <span style="font-size: 0.9rem;">— Ruth 1:16 NIV</span>
+                    <span class="quote-source">— Ruth 1:16 NIV</span>
                 </div>
             </div>
 
             <!-- Column 2: Rsvp -->
-            <div style="flex: 1; min-width: 300px; text-align: center;">
-                <div
-                    style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: inline-block; width: 100%; max-width: 400px;">
-                    <h3 class="font-holiday" style="margin-top:0; color: var(--accent-color); font-size: 2.5rem;">Rsvp
-                    </h3>
-                    <p style="font-size: 0.9rem; margin: 0.5rem 0; color: #777;">Please confirm by 12th March 2026</p>
-                    <hr style="border: 0; border-top: 1px solid #eee; margin: 1rem 0;">
-                    <p style="margin: 0.5rem 0; font-size: 1.1rem;">Irene Sathege: <strong>+27 73 146 8192</strong></p>
-                    <p style="margin: 0.5rem 0; font-size: 1.1rem;">Kete Sadiki: <strong>+27 72 239 9527</strong></p>
-                    <p style="margin: 0.5rem 0; font-size: 1.1rem;">Beauty Rasetilo: <strong>+27 73 805 3169</strong>
-                    </p>
-                    <p
-                        style="color: #c0392b; font-size: 0.8rem; margin-top: 1.5rem; font-weight: bold; letter-spacing: 1px;">
+            <div class="details-column">
+                <div class="rsvp-card">
+                    <h3 class="rsvp-title">Rsvp</h3>
+                    <p class="rsvp-subtitle">Please confirm by 12th March 2026</p>
+                    <hr class="rsvp-divider">
+                    <p class="contact-info">Irene Sathege: <strong>+27 73 146 8192</strong></p>
+                    <p class="contact-info">Kete Sadiki: <strong>+27 72 239 9527</strong></p>
+                    <p class="contact-info">Beauty Rasetilo: <strong>+27 73 805 3169</strong></p>
+                    <p class="no-children-notice">
                         * NO CHILDREN ALLOWED</p>
                 </div>
             </div>

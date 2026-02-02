@@ -330,13 +330,259 @@ th {
 .badge-secondary {
     background-color: var(--reserved-color);
 }
+
 /* Slideshow Animation */
 .fade {
-  animation-name: fade;
-  animation-duration: 2s;
+    animation-name: fade;
+    animation-duration: 2s;
 }
 
 @keyframes fade {
-  from {opacity: .4} 
-  to {opacity: 1}
+    from {
+        opacity: .4
+    }
+
+    to {
+        opacity: 1
+    }
+}
+
+/* --- Extracted & Responsive Styles --- */
+
+.details-section {
+    display: flex;
+    justify-content: center;
+    gap: 4rem;
+    flex-wrap: wrap;
+    margin: 3rem auto;
+    font-family: var(--font-serif);
+    align-items: flex-start;
+    max-width: 1000px;
+    padding: 0 1rem;
+}
+
+.details-column {
+    flex: 1;
+    min-width: 300px;
+    text-align: center;
+}
+
+.section-title {
+    color: var(--accent-color);
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    font-family: var(--font-holiday);
+}
+
+.details-text {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.details-text.venue {
+    margin-bottom: 1rem;
+}
+
+.map-container {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.map-frame {
+    filter: grayscale(100%) sepia(20%) contrast(90%) opacity(0.9);
+    border: none;
+    width: 100%;
+    height: 100%;
+}
+
+.quote-box {
+    margin-top: 2rem;
+    font-style: italic;
+    color: #555;
+    font-size: 1.2rem;
+}
+
+.quote-source {
+    font-size: 0.9rem;
+}
+
+.rsvp-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    display: inline-block;
+    width: 100%;
+    max-width: 400px;
+}
+
+.rsvp-title {
+    margin-top: 0;
+    color: var(--accent-color);
+    font-size: 2.5rem;
+    font-family: var(--font-holiday);
+}
+
+.rsvp-subtitle {
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+    color: #777;
+}
+
+.rsvp-divider {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 1rem 0;
+}
+
+.contact-info {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.no-children-notice {
+    color: #c0392b;
+    font-size: 0.8rem;
+    margin-top: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* --- Media Queries --- */
+
+/* Tablet & Mobile adjustments */
+@media (max-width: 1024px) {
+    .container {
+        width: 90%;
+    }
+
+    .details-section {
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.5rem;
+        /* Smaller main heading */
+    }
+
+    .container {
+        margin: 1rem auto;
+    }
+
+    .details-section {
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+        margin: 2rem auto;
+    }
+
+    .details-column {
+        width: 100%;
+        min-width: unset;
+        /* Allow it to shrink if needed */
+    }
+
+    .section-title,
+    .rsvp-title {
+        font-size: 2rem;
+    }
+
+    .map-container {
+        height: 250px;
+        /* Taller map on mobile for better visibility */
+    }
+
+    .seat-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        /* 6 columns for mobile */
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .seat {
+        width: 28px;
+        height: 28px;
+        font-size: 0.7rem;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 1.5rem;
+    }
+
+    /* Login card responsive */
+    .login-card {
+        width: 90%;
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    .section-title,
+    .rsvp-title {
+        font-size: 1.8rem;
+    }
+
+    .details-text,
+    .quote-box,
+    .contact-info {
+        font-size: 1rem;
+    }
+
+    .rsvp-card {
+        padding: 1.5rem;
+    }
+
+    .legend {
+        gap: 1rem;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .seat-grid {
+        grid-template-columns: repeat(5, 1fr);
+        /* Even fewer columns for very small screens */
+    }
+}
+
+/* --- Admin Responsive --- */
+.table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table-wrapper table {
+    min-width: 600px;
+    /* Ensure table doesn't squash too much */
+    box-shadow: none;
+    /* Shadow moved to wrapper */
+    border-radius: 0;
+}
+
+.admin-divider {
+    margin: 3rem 0;
+    border: 0;
+    border-top: 1px solid #ccc;
+}
+
+.btn-full {
+    width: 100%;
+}
+
+.mt-1 {
+    margin-top: 1rem;
 }
