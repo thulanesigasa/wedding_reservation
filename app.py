@@ -132,7 +132,6 @@ def send_email(to_email, subject, body, include_footer=True):
         server.login(sender_email, sender_password)
         server.send_message(msg)
         server.quit()
-        print(f"Email sent to {to_email}")
         return True
     except Exception as e:
         print(f"Error sending email: {e}")
