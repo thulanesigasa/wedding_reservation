@@ -157,17 +157,18 @@
                             <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
                                 {% if not r.email_sent %}
                                 <button onclick="handleAction('{{ r.id }}', 'send_email')" class="btn btn-small"
-                                    style="font-size: 0.8rem; padding: 0.3rem 0.8rem; background-color: var(--accent-color); width: 100%;">Send
+                                    style="font-size: 0.8rem; padding: 0.5rem; background-color: var(--accent-color); width: 100%; margin-top: 0;">Send
                                     Email</button>
                                 <button onclick="handleAction('{{ r.id }}', 'accept')" class="btn btn-small btn-approve"
-                                    style="font-size: 0.8rem; padding: 0.3rem 0.8rem; width: 100%;">Undo
+                                    style="font-size: 0.8rem; padding: 0.5rem; width: 100%; margin-top: 0;">Undo
                                     (Accept)</button>
                                 {% else %}
                                 <span class="badge"
-                                    style="background-color: var(--accent-color); color: white; font-size: 0.8rem; padding: 0.3rem 0.8rem; width: 100%; box-sizing: border-box; display: block; border-radius: 4px;">Email
+                                    style="background-color: var(--accent-color); color: white; font-size: 0.8rem; padding: 0.5rem; width: 100%; box-sizing: border-box; display: block; border-radius: 4px;">Email
                                     Sent</span>
-                                <button onclick="handleAction('{{ r.id }}', 'send_email')" class="btn btn-small"
-                                    style="font-size: 0.8rem; padding: 0.3rem 0.8rem; background-color: var(--accent-color); width: 100%;">Resend</button>
+                                <button onclick="handleAction('{{ r.id }}', 'send_email')"
+                                    class="btn btn-small btn-approve"
+                                    style="font-size: 0.8rem; padding: 0.5rem; width: 100%; margin-top: 0;">Resend</button>
                                 <button onclick="handleAction('{{ r.id }}', 'accept')" class="btn btn-small btn-approve"
                                     style="font-size: 0.8rem; padding: 0.3rem 0.8rem; width: 100%;">Undo
                                     (Accept)</button>
