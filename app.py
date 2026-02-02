@@ -73,6 +73,9 @@ def send_email(to_email, subject, body, include_footer=True):
     sender_password = os.environ.get('MAIL_PASSWORD')
     smtp_server = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
     smtp_port = int(os.environ.get('MAIL_PORT', 587))
+    
+    print(f"DEBUG: Attempting to send email to {to_email}")
+    print(f"DEBUG: Server={smtp_server}, Port={smtp_port}, User={sender_email}")
 
     # HTML Email Template
     html_body = f"""
