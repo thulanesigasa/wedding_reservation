@@ -6,6 +6,9 @@ from email.mime.multipart import MIMEMultipart
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv() # Load variables from .env if present
 
 app = Flask(__name__)
 # Production Configuration
@@ -65,26 +68,12 @@ class Reservation(db.Model):
         }
 
 # --- Helper Functions ---
-def send_email(to_email, subject, body):
+def send_email(to_email, subject, body, include_footer=True):
     sender_email = os.environ.get('MAIL_USERNAME')
     sender_password = os.environ.get('MAIL_PASSWORD')
     smtp_server = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
     smtp_port = int(os.environ.get('MAIL_PORT', 587))
 
-    # Fallback to mock if credentials are missing (Local Dev)
-    if not sender_email or not sender_password:
-        print("----------------------------------------------------------------")
-        print(f"[MOCK EMAIL] To: {to_email}")
-        print(f"Subject: {subject}")
-        print(f"Body: {body}")
-        print("----------------------------------------------------------------")
-        return True
-
-    msg = MIMEMultipart()
-    msg['From'] = f"Ndivhuwo & Mpho <{sender_email}>"
-    msg['To'] = to_email
-    msg['Subject'] = subject
-    
     # HTML Email Template
     html_body = f"""
     <html>
@@ -97,18 +86,38 @@ def send_email(to_email, subject, body):
                 <div style="text-align: left; margin: 30px 0;">
                     {body}
                 </div>
-                
+                """
+    
+    if include_footer:
+        html_body += """
                 <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; color: #888; font-size: 0.9em;">
                     <p>We can't wait to celebrate with you!</p>
                     <p><strong>Date:</strong> 2nd May 2026<br>
                     <strong>Venue:</strong> 22 Denne Rd., Rand Collieries, Brakpan</p>
                 </div>
+        """
+        
+    html_body += """
             </div>
         </body>
     </html>
     """
     
+    msg = MIMEMultipart()
+    msg['From'] = f"Ndivhuwo & Mpho <{sender_email}>"
+    msg['To'] = to_email
+    msg['Subject'] = subject
     msg.attach(MIMEText(html_body, 'html'))
+
+    # Fallback to mock if credentials are missing (Local Dev)
+    if not sender_email or not sender_password:
+        print("----------------------------------------------------------------")
+        print(f"[MOCK EMAIL] To: {to_email}")
+        print(f"Subject: {subject}")
+        print("Body Content (HTML Preview):")
+        print(html_body)
+        print("----------------------------------------------------------------")
+        return True
 
     try:
         server = smtplib.SMTP(smtp_server, smtp_port)
@@ -124,8 +133,8 @@ def send_email(to_email, subject, body):
 
 # Async Wrapper
 import threading
-def send_email_async(to_email, subject, body):
-    thread = threading.Thread(target=send_email, args=(to_email, subject, body))
+def send_email_async(to_email, subject, body, include_footer=True):
+    thread = threading.Thread(target=send_email, args=(to_email, subject, body, include_footer))
     thread.daemon = True
     thread.start()
 
@@ -292,10 +301,12 @@ def admin_action(id, action):
         return jsonify({'success': True, 'message': 'Reservation declined.'})
     
     elif action == 'send_email':
+        include_footer = True
         if reservation.status == 'CONFIRMED':
             subject = "You're In! Wedding Confirmation"
-            body = f"<p>Dear {reservation.first_name},</p><p>Your seat <strong>#{reservation.seat_number}</strong> for the wedding of Ndivhuwo & Mpho has been confirmed.</p>"
+            body = f"<p>Dear {reservation.first_name},</p><p>Your seat <strong>#{reservation.display_seat_number}</strong> for the wedding of Ndivhuwo & Mpho has been confirmed.</p>"
         elif reservation.status == 'DECLINED':
+            include_footer = False
             subject = "Update on your Reservation Request - Ndivhuwo & Mpho"
             body = (f"<p>Dear {reservation.first_name},</p>"
                     "<p>Thank you for RSVPing to our wedding. We are truly humbled by the love and support we have received.</p>"
@@ -305,15 +316,16 @@ def admin_action(id, action):
         else:
             return jsonify({'success': False, 'message': 'Can only send emails to CONFIRMED or DECLINED guests.'}), 400
             
-        if reservation.email_sent:
-             return jsonify({'success': False, 'message': 'Email already sent.'}), 400
+        # if reservation.email_sent:
+        #      return jsonify({'success': False, 'message': 'Email already sent.'}), 400
 
         try:
             # Use Async send to avoid timeout on admin dashboard
             send_email_async(
                 reservation.email,
                 subject,
-                body
+                body,
+                include_footer=include_footer
             )
             reservation.email_sent = True
             db.session.commit()
