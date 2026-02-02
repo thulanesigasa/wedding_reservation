@@ -205,6 +205,15 @@ def reserve():
 
     if not seat_number:
         return jsonify({'success': False, 'message': 'Sorry, no seats available.'}), 400
+
+    # DUPLICATE CHECK: Check if email or phone already exists (ANY Status - Including Declined)
+    existing_user = Reservation.query.filter(
+        (Reservation.email == data['email']) | (Reservation.phone == data['phone'])
+    ).first()
+
+    if existing_user:
+        return jsonify({'success': False, 'message': 'A reservation with this email or phone number already exists.'}), 400
+
     new_reservation = Reservation(
         seat_number=seat_number,
         first_name=data['first_name'],
