@@ -40,10 +40,21 @@ class Reservation(db.Model):
     email_sent = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    @property
+    def display_seat_number(self):
+        if self.seat_number is None:
+            return "?"
+        
+        val = abs(self.seat_number)
+        if val >= 1000:
+            return val % 1000
+        return val
+
     def to_dict(self):
         return {
             'id': self.id,
-            'seat_number': self.seat_number,
+            'seat_number': self.display_seat_number, # Use display version
+            'raw_seat_number': self.seat_number,
             'first_name': self.first_name,
             'surname': self.surname,
             'phone': self.phone,

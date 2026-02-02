@@ -60,7 +60,7 @@
                 <tbody>
                     {% for r in reservations %}
                     <tr id="row-{{ r.id }}">
-                        <td>#{{ r.seat_number }}</td>
+                        <td>#{{ r.display_seat_number }}</td>
                         <td>{{ r.first_name }} {{ r.surname }}</td>
                         <td>
                             {{ r.phone }}<br>
@@ -100,7 +100,7 @@
                 <tbody>
                     {% for r in confirmed %}
                     <tr>
-                        <td>#{{ r.seat_number }}</td>
+                        <td>#{{ r.display_seat_number }}</td>
                         <td>{{ r.first_name }} {{ r.surname }}</td>
                         <td>{{ r.phone }}<br>{{ r.email }}</td>
                         <td>{{ r.dietary_restrictions }}</td>
@@ -144,7 +144,7 @@
                 <tbody>
                     {% for r in declined %}
                     <tr>
-                        <td>#{{ r.seat_number|abs }}</td>
+                        <td>#{{ r.display_seat_number }}</td>
                         <td>{{ r.first_name }} {{ r.surname }}</td>
                         <td>{{ r.phone }}<br>{{ r.email }}</td>
                         <td>Declined</td>
