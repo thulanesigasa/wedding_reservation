@@ -354,6 +354,41 @@ def admin_action(id, action):
         
     return jsonify({'success': False, 'message': 'Invalid action'}), 400
 
+@app.route('/seating')
+def seating():
+    return render_template('seating.html')
+
+@app.route('/api/search_guest')
+def search_guest():
+    query = request.args.get('q', '').strip()
+    if not query:
+        return jsonify([])
+
+    # Basic case-insensitive search
+    # We only want CONFIRMED guests (as per user request "who was accepted")
+    # Also ensuring they have a positive seat number assigned
+    results = Reservation.query.filter(
+        Reservation.status == 'CONFIRMED',
+        Reservation.seat_number > 0,
+        (Reservation.first_name.ilike(f'%{query}%')) | (Reservation.surname.ilike(f'%{query}%'))
+    ).limit(10).all()
+
+    response_data = []
+    for r in results:
+        # Calculate Table Number (Assumed 10 seats per table)
+        # Seat 1-10 = Table 1, 11-20 = Table 2, etc.
+        # Formula: (seat - 1) // 10 + 1
+        table_number = (r.seat_number - 1) // 10 + 1
+        
+        response_data.append({
+            'id': r.id,
+            'full_name': f"{r.first_name} {r.surname}",
+            'seat_number': r.display_seat_number,
+            'table_number': table_number
+        })
+    
+    return jsonify(response_data)
+
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)

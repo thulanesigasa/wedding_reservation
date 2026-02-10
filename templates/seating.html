@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Your Seat - Ndivhuwo & Mpho</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Great+Vibes&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* Page Specific Styles */
+        .seating-container {
+            max-width: 600px;
+            margin: 4rem auto;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .search-wrapper {
+            position: relative;
+            margin: 2rem 0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1.2rem;
+            border: 2px solid var(--accent-color);
+            border-radius: 50px;
+            outline: none;
+            font-family: var(--font-serif);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(233, 150, 122, 0.1);
+        }
+
+        .search-input:focus {
+            box-shadow: 0 4px 20px rgba(233, 150, 122, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            margin-top: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            list-style: none;
+            padding: 0;
+            overflow: hidden;
+            display: none;
+            z-index: 1000;
+        }
+
+        .suggestions-list li {
+            padding: 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+            text-align: left;
+            font-size: 1.1rem;
+        }
+
+        .suggestions-list li:last-child {
+            border-bottom: none;
+        }
+
+        .suggestions-list li:hover {
+            background-color: #FFF5EE;
+            /* Seashell */
+            color: var(--accent-color);
+        }
+
+        .result-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-top: 3rem;
+            display: none;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-title {
+            font-family: var(--font-holiday);
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .table-number {
+            font-size: 5rem;
+            font-weight: 700;
+            color: #4a4a4a;
+            line-height: 1;
+            margin: 1rem 0;
+        }
+
+        .seat-detail {
+            font-size: 1.2rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 3rem;
+            color: #888;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .loading-spinner {
+            display: none;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: translateY(-50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translateY(-50%) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="seating-container">
+        <header>
+            <h1 class="font-holiday" style="font-size: 3rem; margin-bottom: 0.5rem;">Find Your Seat</h1>
+            <p>Welcome to the wedding of Ndivhuwo & Mpho</p>
+        </header>
+
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" class="search-input" placeholder="Type your name..." autocomplete="off">
+            <div class="loading-spinner" id="spinner"></div>
+            <ul class="suggestions-list" id="suggestions"></ul>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-title">Welcome, <span id="guestName">Guest</span>!</div>
+            <p style="font-style: italic; margin-bottom: 2rem;">We are delighted to have you.</p>
+
+            <p class="seat-detail">You are seated at</p>
+            <div class="table-number">Table <span id="tableNum">1</span></div>
+            <p class="seat-detail">Seat #<span id="seatNum">5</span></p>
+        </div>
+
+        <a href="/" class="back-link">← Back to Home</a>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsList = document.getElementById('suggestions');
+        const resultCard = document.getElementById('resultCard');
+        const spinner = document.getElementById('spinner');
+
+        // Result elements
+        const guestName = document.getElementById('guestName');
+        const tableNum = document.getElementById('tableNum');
+        const seatNum = document.getElementById('seatNum');
+
+        let debounceTimer;
+
+        searchInput.addEventListener('input', function (e) {
+            const query = e.target.value.trim();
+
+            clearTimeout(debounceTimer);
+
+            // Hide result if typing
+            if (resultCard.style.display === 'block') {
+                resultCard.style.display = 'none';
+                guestName.textContent = '';
+            }
+
+            if (query.length < 2) {
+                suggestionsList.style.display = 'none';
+                return;
+            }
+
+            spinner.style.display = 'block';
+
+            debounceTimer = setTimeout(() => {
+                fetchSuggestions(query);
+            }, 300);
+        });
+
+        async function fetchSuggestions(query) {
+            try {
+                const response = await fetch(`/api/search_guest?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                spinner.style.display = 'none';
+                renderSuggestions(data);
+            } catch (error) {
+                console.error('Error fetching suggestions:', error);
+                spinner.style.display = 'none';
+            }
+        }
+
+        function renderSuggestions(guests) {
+            suggestionsList.innerHTML = '';
+
+            if (guests.length === 0) {
+                suggestionsList.style.display = 'none';
+                return;
+            }
+
+            guests.forEach(guest => {
+                const li = document.createElement('li');
+                li.textContent = guest.full_name;
+                li.onclick = () => selectGuest(guest);
+                suggestionsList.appendChild(li);
+            });
+
+            suggestionsList.style.display = 'block';
+        }
+
+        function selectGuest(guest) {
+            searchInput.value = guest.full_name;
+            suggestionsList.style.display = 'none';
+
+            // Fill result card
+            guestName.textContent = guest.full_name;
+            tableNum.textContent = guest.table_number;
+            seatNum.textContent = guest.seat_number;
+
+            // Show result
+            resultCard.style.display = 'block';
+
+            // Celebrate!
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#E9967A', '#FFDAB9', '#FFF']
+            });
+        }
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !suggestionsList.contains(e.target)) {
+                suggestionsList.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
