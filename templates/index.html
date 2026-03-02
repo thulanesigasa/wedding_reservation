@@ -50,7 +50,10 @@
             <div class="details-column">
                 <div class="rsvp-card">
                     <h3 class="rsvp-title">Rsvp</h3>
-                    <p class="rsvp-subtitle">Please confirm by 12th March 2026</p>
+                    <p class="rsvp-subtitle">Please confirm by 14th March 2026</p>
+                    <div id="countdown" class="countdown"></div>
+                    <p class="rsvp-note">Note: If you have not reserved a seat by the close date, no exceptions will be
+                        made.</p>
                     <hr class="rsvp-divider">
                     <p class="contact-info">Irene Sathege: <strong>+27 73 146 8192</strong></p>
                     <p class="contact-info">Kete Sadiki: <strong>+27 72 239 9527</strong></p>
@@ -170,6 +173,26 @@
                 modal.style.display = "none";
             }
         }
+
+        // Countdown Timer Logic
+        const rsvpDate = new Date("March 14, 2026 23:59:59").getTime();
+        const countdownEl = document.getElementById("countdown");
+
+        const countdownTimer = setInterval(function () {
+            const now = new Date().getTime();
+            const distance = rsvpDate - now;
+
+            if (distance < 0) {
+                clearInterval(countdownTimer);
+                if (countdownEl) countdownEl.innerHTML = "RSVP Closed";
+            } else {
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                if (countdownEl) countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }
+        }, 1000);
 
         // Form Submission
         const form = document.getElementById('reservationForm');

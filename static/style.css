@@ -439,6 +439,23 @@ th {
     color: #777;
 }
 
+.countdown {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+    margin: 0.5rem 0;
+    font-family: var(--font-holiday);
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.rsvp-note {
+    font-size: 0.85rem;
+    color: #c0392b;
+    font-style: italic;
+    margin: 0 0 1rem;
+    padding: 0 10px;
+}
+
 .rsvp-divider {
     border: 0;
     border-top: 1px solid #eee;
