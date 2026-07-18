@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ndivhuwo & Mpho - Wedding Reservation</title>
+    <link rel="stylesheet" href="static/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Great+Vibes&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1 class="font-holiday">Ndivhuwo & Mpho</h1>
+            <p>We invite you to celebrate our special day with us.</p>
+        </header>
+
+        <!-- Wedding Details & Rsvp Sections -->
+        <div class="details-section">
+
+            <!-- Column 1: Wedding Details -->
+            <div class="details-column">
+                <h2 class="section-title">Wedding Details</h2>
+
+                <p class="details-text"><strong>Date:</strong> 2nd May 2026 @ 10:00 AM</p>
+                <p class="details-text venue"><strong>Venue:</strong> 22 Denne Rd., Rand Collieries, Brakpan</p>
+
+                <!-- Google Map with Theme Styling -->
+                <div class="map-container">
+                    <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
+                        src="https://maps.google.com/maps?q=22%20Denne%20Rd%2C%20Rand%20Collieries%2C%20Brakpan&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                        class="map-frame"></iframe>
+                </div>
+
+                <p class="details-text"><strong>Theme:</strong> Beige & White</p>
+
+                <div class="quote-box">
+                    "Where you go I will go, and where you stay I will stay." <br>
+                    <span class="quote-source">— Ruth 1:16 NIV</span>
+                </div>
+            </div>
+
+            <!-- Column 2: Rsvp -->
+            <div class="details-column">
+                <div class="rsvp-card">
+                    <h3 class="rsvp-title">Rsvp</h3>
+                    <p class="rsvp-subtitle">Please confirm by 31st March 2026</p>
+                    <div id="countdown" class="countdown"></div>
+                    <hr class="rsvp-divider">
+                    <p class="contact-info">Irene Sathege: <strong>+27 73 146 8192</strong></p>
+                    <p class="contact-info">Kete Sadiki: <strong>+27 72 239 9527</strong></p>
+                    <p class="contact-info">Beauty Rasetilo: <strong>+27 73 805 3169</strong></p>
+                    <p class="no-children-notice">
+                        * NO CHILDREN ALLOWED</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Countdown Timer Logic
+        const rsvpDate = new Date("March 31, 2026 23:59:59").getTime();
+        const countdownEl = document.getElementById("countdown");
+
+        const countdownTimer = setInterval(function () {
+            const now = new Date().getTime();
+            const distance = rsvpDate - now;
+
+            if (distance < 0) {
+                clearInterval(countdownTimer);
+                if (countdownEl) countdownEl.innerHTML = "RSVP Closed";
+            } else {
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                if (countdownEl) countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }
+        }, 1000);
+    </script>
+</body>
+
+</html>
